@@ -1,0 +1,978 @@
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\index.html ###
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CrudApp</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\main.ts ###
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+import { AppModule } from './app/app.module';
+
+
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.error(err));
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\styles.css ###
+/* You can add global styles to this file, and also import other style files */
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\app-routing.module.ts ###
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { LoginComponent } from './pages/login/login.component';
+import { HomeComponent } from './pages/home/home.component';
+import { UsersComponent } from './pages/home/components/users/users.component';
+import { WelcomeComponent } from './pages/home/components/welcome/welcome.component';
+import { TodoListComponent } from './pages/home/pages/todo-list/todo-list.component';
+import { SignupComponent } from './pages/signup/signup.component';
+import { AddUserComponent } from './pages/home/components/add-user/add-user.component';
+import { EditUserComponent } from './pages/home/components/edit-user/edit-user.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'signup', component: SignupComponent },
+  {
+    path: 'app', component: HomeComponent,
+    children: [
+      { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+      { path: 'welcome', component: WelcomeComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'todo-list', component: TodoListComponent },
+      { path: 'add-user', component: AddUserComponent },
+      { path: 'edit-user', component: EditUserComponent }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\app.component.css ###
+.full-height {
+  min-height: 100%;
+  height: 80vh;
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\app.component.html ###
+<app-navbar></app-navbar>
+<router-outlet></router-outlet>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\app.component.spec.ts ###
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(() => TestBed.configureTestingModule({
+    declarations: [AppComponent]
+  }));
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(`should have as title 'crud-app'`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('crud-app');
+  });
+
+  it('should render title', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.content span')?.textContent).toContain('crud-app app is running!');
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\app.component.ts ###
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\app.module.ts ###
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { LoginComponent } from './pages/login/login.component';
+import { SignupComponent } from './pages/signup/signup.component';
+import { HomeComponent } from './pages/home/home.component';
+import { NavbarComponent } from './pages/home/components/navbar/navbar.component';
+import { UsersComponent } from './pages/home/components/users/users.component';
+import { AddUserComponent } from './pages/home/components/add-user/add-user.component';
+import { EditUserComponent } from './pages/home/components/edit-user/edit-user.component';
+import { WelcomeComponent } from './pages/home/components/welcome/welcome.component';
+import { TodoListComponent } from './pages/home/pages/todo-list/todo-list.component';
+import { AppRoutingModule } from './app-routing.module';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    SignupComponent,
+    HomeComponent,
+    NavbarComponent,
+    UsersComponent,
+    AddUserComponent,
+    EditUserComponent,
+    WelcomeComponent,
+    TodoListComponent
+  ],
+  imports: [
+    BrowserModule,
+    RouterModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\home.component.css ###
+.container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\home.component.html ###
+<div class="container mt-5">
+  <h2>Home</h2>
+  <div class="mb-3">
+    <h3>Resumo dos Usu�rios</h3>
+    <p>Quantidade de usu�rios cadastrados: {{ userSummary.totalUsers }}</p>
+    <table class="table table-dark table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Fun��o</th>
+          <th scope="col">Quantidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let role of userSummary.roles">
+          <td>{{ role.role }}</td>
+          <td>{{ role.count }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<router-outlet></router-outlet>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\home.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { HomeComponent } from './home.component';
+
+describe('HomeComponent', () => {
+  let component: HomeComponent;
+  let fixture: ComponentFixture<HomeComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [HomeComponent]
+    });
+    fixture = TestBed.createComponent(HomeComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\home.component.ts ###
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent {
+  userSummary = {
+    totalUsers: 3,
+    roles: [
+      { role: 'Engenheiro de FE', count: 1 },
+      { role: 'Analista de dados', count: 1 },
+      { role: 'L�der T�cnico', count: 1 }
+    ]
+  };
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\add-user\add-user.component.css ###
+.container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\add-user\add-user.component.html ###
+<div class="container mt-5">
+  <h2>Add User</h2>
+  <form [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nome</label>
+      <input type="text" class="form-control" id="name" formControlName="name">
+      <div *ngIf="addUserForm.get('name')?.invalid && addUserForm.get('name')?.touched" class="text-danger">
+        Nome � obrigat�rio
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" formControlName="email">
+      <div *ngIf="addUserForm.get('email')?.invalid && addUserForm.get('email')?.touched" class="text-danger">
+        Por favor insira um e-mail v�lido
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="role" class="form-label">Fun��o</label>
+      <select class="form-select" id="role" formControlName="role">
+        <option value="" disabled selected>Selecione a fun��o</option>
+        <option value="Engenheiro de FE">Engenheiro de FE</option>
+        <option value="Engenheiro de BE">Engenheiro de BE</option>
+        <option value="Analista de dados">Analista de dados</option>
+        <option value="L�der T�cnico">Lider Tecnico</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Senha</label>
+      <input type="password" class="form-control" id="password" formControlName="password">
+      <div *ngIf="addUserForm.get('password')?.invalid && addUserForm.get('password')?.touched" class="text-danger">
+        Por favor insira uma senha entre 6 e 15 caracteres
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="addUserForm.invalid">Salvar</button>
+  </form>
+</div>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\add-user\add-user.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AddUserComponent } from './add-user.component';
+
+describe('AddUserComponent', () => {
+  let component: AddUserComponent;
+  let fixture: ComponentFixture<AddUserComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [AddUserComponent]
+    });
+    fixture = TestBed.createComponent(AddUserComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\add-user\add-user.component.ts ###
+import { Component, EventEmitter, Output } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { User } from '../users/users.component';
+
+@Component({
+  selector: 'app-add-user',
+  templateUrl: './add-user.component.html',
+  styleUrls: ['./add-user.component.css']
+})
+export class AddUserComponent {
+  @Output() userAdded = new EventEmitter<User>();
+  addUserForm: FormGroup;
+
+  constructor(private router: Router) {
+    this.addUserForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      role: new FormControl('', Validators.required),
+      password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(15)])
+    });
+  }
+
+  onSubmit() {
+    if (this.addUserForm.valid) {
+      this.userAdded.emit(this.addUserForm.value);
+    }
+  }
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\edit-user\edit-user.component.css ###
+.container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\edit-user\edit-user.component.html ###
+<div class="container mt-5">
+  <h2>Edit User</h2>
+  <form [formGroup]="editUserForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nome</label>
+      <input type="text" class="form-control" id="name" formControlName="name">
+      <div *ngIf="editUserForm.get('name')?.invalid && editUserForm.get('name')?.touched" class="text-danger">
+        Nome � obrigat�rio
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" formControlName="email">
+      <div *ngIf="editUserForm.get('email')?.invalid && editUserForm.get('email')?.touched" class="text-danger">
+        Por favor insira um e-mail v�lido
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="role" class="form-label">Fun��o</label>
+      <select class="form-select" id="role" formControlName="role">
+        <option value="Engenheiro de FE">Engenheiro de FE</option>
+        <option value="Engenheiro de BE">Engenheiro de BE</option>
+        <option value="Analista de dados">Analista de dados</option>
+        <option value="L�der T�cnico">L�der T�cnico</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Senha</label>
+      <input type="password" class="form-control" id="password" formControlName="password">
+      <div *ngIf="editUserForm.get('password')?.invalid && editUserForm.get('password')?.touched" class="text-danger">
+        Por favor insira uma senha entre 6 e 15 caracteres
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="editUserForm.invalid">Salvar</button>
+  </form>
+</div>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\edit-user\edit-user.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { EditUserComponent } from './edit-user.component';
+
+describe('EditUserComponent', () => {
+  let component: EditUserComponent;
+  let fixture: ComponentFixture<EditUserComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [EditUserComponent]
+    });
+    fixture = TestBed.createComponent(EditUserComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\edit-user\edit-user.component.ts ###
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-edit-user',
+  templateUrl: './edit-user.component.html',
+  styleUrls: ['./edit-user.component.css']
+})
+export class EditUserComponent implements OnInit {
+
+  editUserForm: FormGroup;
+
+  constructor(private router: Router) {
+    this.editUserForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      role: new FormControl('', Validators.required),
+      password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(15)])
+    });
+  }
+
+  ngOnInit() {
+    const user = { name: 'Joao Teixeira', email: 'jt123@example.com', role: 'Engenheiro de FE', password: '123456' };
+    this.editUserForm.patchValue(user);
+  }
+
+  onSubmit() {
+    console.log('User edited:', this.editUserForm.value);
+    this.router.navigate(['/app/users']);
+  }
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\navbar\navbar.component.css ###
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\navbar\navbar.component.html ###
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/app/welcome">My App</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/app/welcome">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/app/users">Users</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/app/todo-list">Todo List</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/app/add-user">Add User</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/app/edit-user">Edit User</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <button class="btn btn-outline-danger" routerLink="/login">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\navbar\navbar.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { NavbarComponent } from './navbar.component';
+
+describe('NavbarComponent', () => {
+  let component: NavbarComponent;
+  let fixture: ComponentFixture<NavbarComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [NavbarComponent]
+    });
+    fixture = TestBed.createComponent(NavbarComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\navbar\navbar.component.ts ###
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-navbar',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css']
+})
+export class NavbarComponent {
+
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\users\users.component.css ###
+.full-height {
+  min-height: 100%;
+  height: 80vh;
+}
+
+.table-dark {
+  background: #343a40;
+  color: #fff;
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\users\users.component.html ###
+<div class="container mt-5">
+  <h2>Users</h2>
+  <app-add-user (userAdded)="addUser($event)"></app-add-user>
+  <table class="table table-dark table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Nome</th>
+        <th scope="col">Email</th>
+        <th scope="col">Fun��o</th>
+        <th scope="col">A��es</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of userList; let i = index">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+        <td>
+          <button class="btn btn-warning" routerLink="/app/edit-user">Editar</button>
+          <button class="btn btn-danger" (click)="deleteUser(i)">Deletar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\users\users.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { UsersComponent } from './users.component';
+
+describe('UsersComponent', () => {
+  let component: UsersComponent;
+  let fixture: ComponentFixture<UsersComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [UsersComponent]
+    });
+    fixture = TestBed.createComponent(UsersComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\users\users.component.ts ###
+import { Component } from '@angular/core';
+
+export interface User {
+  name: string;
+  email: string;
+  role: string;
+}
+
+@Component({
+  selector: 'app-users',
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.css']
+})
+export class UsersComponent {
+  userList: User[] = [
+    { name: 'Jose Teixeira', email: 'jt123@example.com', role: 'Engenheiro de FE' },
+    { name: 'Roberto Silva', email: 'rs123@example.com', role: 'Analista de dados' },
+    { name: 'Emily Rocha', email: 'em123@example.com', role: 'L�der T�cnico' }
+  ];
+
+  addUser(user: User) {
+    this.userList.push(user);
+  }
+
+  deleteUser(index: number) {
+    this.userList.splice(index, 1);
+  }
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\welcome\welcome.component.css ###
+.full-height {
+  min-height: 100%;
+  height: 80vh;
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\welcome\welcome.component.html ###
+<div class="container-fluid">
+  <div class="row  align-items-center text-center full-height">
+    <div class="col">
+      <h1>Welcome to your aplication</h1>
+      <h2>You are logged in</h2>
+    </div>
+  </div>
+</div>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\welcome\welcome.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { WelcomeComponent } from './welcome.component';
+
+describe('WelcomeComponent', () => {
+  let component: WelcomeComponent;
+  let fixture: ComponentFixture<WelcomeComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [WelcomeComponent]
+    });
+    fixture = TestBed.createComponent(WelcomeComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\components\welcome\welcome.component.ts ###
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-welcome',
+  templateUrl: './welcome.component.html',
+  styleUrls: ['./welcome.component.css']
+})
+export class WelcomeComponent {
+
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\pages\todo-list\todo-list.component.css ###
+.content {
+  background-color: #fff;
+  padding: 60px;
+  min-height: 100%;
+  height: 90vh;
+}
+
+.table-item {
+  cursor: pointer;
+}
+
+.task-done {
+  text-decoration: line-through;
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\pages\todo-list\todo-list.component.html ###
+<div class="container-fluid">
+  <div class="row align-items-left text-left">
+    <div class="col content">
+      <table class="table table-dark table-hover table-item text-center">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Descri��o da Tarefa</th>
+            <th scope="col">Conclu�da</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let task of taskList" [ngClass]="{'task-done': task.done}" (click)="changeTask(task)">
+            <th scope="row">{{ taskList.indexOf(task) + 1 }}</th>
+            <td>{{ task.description }}</td>
+            <td>
+              <input class="form-check-input" type="checkbox" [(ngModel)]="task.done" [checked]="task.done">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\pages\todo-list\todo-list.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TodoListComponent } from './todo-list.component';
+
+describe('TodoListComponent', () => {
+  let component: TodoListComponent;
+  let fixture: ComponentFixture<TodoListComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [TodoListComponent]
+    });
+    fixture = TestBed.createComponent(TodoListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\home\pages\todo-list\todo-list.component.ts ###
+import { Component } from '@angular/core';
+
+interface Task {
+  description: string;
+  done: boolean;
+}
+
+@Component({
+  selector: 'app-todo-list',
+  templateUrl: './todo-list.component.html',
+  styleUrls: ['./todo-list.component.css']
+})
+export class TodoListComponent {
+  taskList: Task[] = [
+    { description: 'Desenvolver novos componentes UI', done: false },
+    { description: 'Corrigir bugs no c�digo JavaScript', done: false },
+    { description: 'Revisar pull requests no GitHub', done: false },
+    { description: 'Analisar tend�ncias de vendas mensais', done: false },
+    { description: 'Preparar relat�rio de desempenho trimestral', done: false },
+    { description: 'Limpar e processar dados brutos', done: false }
+  ];
+
+  changeTask(task: Task) {
+    task.done = !task.done;
+  }
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\login\login.component.css ###
+.gradient-custom {
+  /* fallback for old browsers */
+  background: #6a11cb;
+
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+  }
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\login\login.component.html ###
+<section class="vh-100 gradient-custom">
+  <div class="container py-5 vh-100">
+    <div class="row d-flex justify-content-center align-items-center vh-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-dark text-white" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+
+            <div class="mb-md-5 mt-md-4 pb-5">
+
+              <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
+              <p class="text-white-50 mb-5">Please enter your login and password!</p>
+
+              <form [formGroup]="loginForm">
+
+                <div class="form-outline form-white mb-4">
+                  <!-- ERROR -->
+                  <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
+                    <div class="text-danger">Email é obrigatório</div>
+                  </div>
+                  <!-- ERROR -->
+
+                  <!-- ERROR -->
+                  <div *ngIf="invalidUser">
+                    <div class="text-danger">E-mail / senha inválidos</div>
+                  </div>
+                  <!-- ERROR -->
+
+                  <input type="email" id="typeEmailX" class="form-control form-control-lg" formControlName="email"/>
+                  <label class="form-label" for="typeEmailX">Email</label>
+
+                </div>
+
+
+
+                <div class="form-outline form-white mb-4">
+                  <!-- ERROR -->
+                  <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
+                    <div class="text-danger">Senha é um campo obrigatório</div>
+                  </div>
+                  <!-- ERROR -->
+
+                  <input type="password" id="typePasswordX" class="form-control form-control-lg"  formControlName="password"/>
+                  <label class="form-label" for="typePasswordX">Password</label>
+                </div>
+
+                <button class="btn btn-outline-light btn-lg px-5" (click)="login()" [disabled]="!loginForm.valid">Login</button>
+
+                <div class="d-flex justify-content-center text-center mt-4 pt-1">
+                  <a href="#!" class="text-white"><i class="fab fa-facebook-f fa-lg"></i></a>
+                  <a href="#!" class="text-white"><i class="fab fa-twitter fa-lg mx-4 px-2"></i></a>
+                  <a href="#!" class="text-white"><i class="fab fa-google fa-lg"></i></a>
+                </div>
+              </form>
+
+            </div>
+
+            <div>
+              <p class="mb-0">Don't have an account? <a class="text-white-50 fw-bold" routerLink="/signup">Sign Up</a>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\login\login.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LoginComponent } from './login.component';
+
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [LoginComponent]
+    });
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\login\login.component.ts ###
+import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
+
+  loginForm: FormGroup;
+  invalidUser: boolean = false;
+
+  constructor(private router: Router) {
+    this.loginForm = new FormGroup({
+      email: new FormControl('', [Validators.required]),
+      password: new FormControl('', [Validators.required]),
+    })
+  }
+
+  login() {
+
+    if(this.loginForm.value['email'] == "admin@gmail.com" && this.loginForm.value['password'] == "admin") {
+      this.router.navigate(["/app"])
+    } else {
+      this.invalidUser = true;
+    }
+
+  }
+}
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\signup\signup.component.css ###
+.gradient-custom-3 {
+  /* fallback for old browsers */
+  background: #84fab0;
+
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(to right, rgba(132, 250, 176, 0.5), rgba(143, 211, 244, 0.5));
+
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to right, rgba(132, 250, 176, 0.5), rgba(143, 211, 244, 0.5))
+  }
+  .gradient-custom-4 {
+  /* fallback for old browsers */
+  background: #84fab0;
+
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(to right, rgba(132, 250, 176, 1), rgba(143, 211, 244, 1));
+
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to right, rgba(132, 250, 176, 1), rgba(143, 211, 244, 1))
+  }
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\signup\signup.component.html ###
+<section class="vh-100 bg-image"
+  style="background-image: url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp');">
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+          <div class="card" style="border-radius: 15px;">
+            <div class="card-body p-5">
+              <h2 class="text-uppercase text-center mb-5">Create an account</h2>
+
+              <form [formGroup]="signupForm">
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="form3Example1cg">Nome Completo</label>
+                  <input type="text" formControlName="name" class="form-control form-control-lg">
+
+                  <!-- ERROR -->
+                  <div *ngIf="signupForm.get('name')?.invalid && (signupForm.get('name')?.dirty || signupForm.get('name')?.touched)">
+                    <div class="text-danger">Nome é obrigatório</div>
+                  </div>
+                  <!-- ERROR -->
+
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="form3Example3cg">Email</label>
+                  <input type="text" formControlName="email" class="form-control form-control-lg">
+
+                  <!-- ERROR -->
+                  <div *ngIf="signupForm.get('email')?.invalid && (signupForm.get('email')?.dirty || signupForm.get('email')?.touched)">
+                    <div class="text-danger">Por favor insira um e-mail válido</div>
+                  </div>
+                  <!-- ERROR -->
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="form3Example4cg">Senha</label>
+                  <input type="text" formControlName="password" class="form-control form-control-lg">
+
+                  <!-- ERROR -->
+                  <div *ngIf="signupForm.get('password')?.invalid && (signupForm.get('epasswordmail')?.dirty || signupForm.get('password')?.touched)">
+                    <div class="text-danger">Por favor insira uma senha entre 6 e 20 caracteres</div>
+                  </div>
+                  <!-- ERROR -->
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="form3Example4cdg">Confirmação de senha</label>
+                  <input type="text" formControlName="passwordConfirmation" class="form-control form-control-lg">
+
+                  <!-- ERROR -->
+                  <div *ngIf="signupForm.get('passwordConfirmation')?.invalid && (signupForm.get('passwordConfirmation')?.dirty || signupForm.get('passwordConfirmation')?.touched)">
+                    <div class="text-danger">Por favor insira uma senha entre 6 e 20 caracteres</div>
+                  </div>
+                  <!-- ERROR -->
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button (click)="onSubmit()" [disabled]="!signupForm.valid" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
+                </div>
+
+              </form>
+              <p class="text-center text-muted mt-5 mb-0">Have already an account? <a routerLink="/" class="fw-bold text-body"><u>Login here</u></a></p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\signup\signup.component.spec.ts ###
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { SignupComponent } from './signup.component';
+
+describe('SignupComponent', () => {
+  let component: SignupComponent;
+  let fixture: ComponentFixture<SignupComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [SignupComponent]
+    });
+    fixture = TestBed.createComponent(SignupComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+### C:\estudos\AC2_DevWeb\CRUD-APP\crud-app\src\app\pages\signup\signup.component.ts ###
+import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-signup',
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.css']
+})
+export class SignupComponent {
+
+  signupForm: FormGroup;
+  constructor(private router: Router) {
+
+    this.signupForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]),
+      passwordConfirmation: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(20)])
+    });
+  }
+  onSubmit() {
+    console.log("New user added with success!")
+    console.log(this.signupForm.value);
+
+    this.router.navigate(["/"])
+  }
+
+
+
+}
