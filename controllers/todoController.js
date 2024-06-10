@@ -3,7 +3,6 @@ const Todo = require('../models/Todo');
 
 const router = express.Router();
 
-// Get all todos for logged-in user
 router.get('/', async (req, res) => {
   try {
     const todos = await Todo.find({ owner: req.user._id });
@@ -13,7 +12,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get unassigned todos
 router.get('/unassigned', async (req, res) => {
   try {
     const todos = await Todo.find({ owner: null });
@@ -23,7 +21,6 @@ router.get('/unassigned', async (req, res) => {
   }
 });
 
-// Create a new todo
 router.post('/', async (req, res) => {
   const todo = new Todo({
     ...req.body,
@@ -38,7 +35,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update a todo
 router.put('/:id', async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['description', 'done', 'owner'];
@@ -62,7 +58,6 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete a todo
 router.delete('/:id', async (req, res) => {
   try {
     const todo = await Todo.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
@@ -75,7 +70,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Assign a user to a todo
 router.put('/:id/assign', async (req, res) => {
   const { ownerId } = req.body;
 

@@ -14,9 +14,9 @@ mongoose.connect('mongodb+srv://admin:admin@crud-app.b6hlvck.mongodb.net/?retryW
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
-  console.log('Connected to MongoDB');
+  console.log('Conectado com sucesso');
 }).catch(err => {
-  console.error('Failed to connect to MongoDB', err);
+  console.error('Falha na conexão', err);
 });
 
 const User = require('./models/User');
