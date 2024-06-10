@@ -1,0 +1,36 @@
+<div class="container mt-5">
+  <h2>Edit User</h2>
+  <form [formGroup]="editUserForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nome</label>
+      <input type="text" class="form-control" id="name" formControlName="name">
+      <div *ngIf="editUserForm.get('name')?.invalid && editUserForm.get('name')?.touched" class="text-danger">
+        Nome é obrigatório
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" formControlName="email">
+      <div *ngIf="editUserForm.get('email')?.invalid && editUserForm.get('email')?.touched" class="text-danger">
+        Por favor insira um e-mail válido
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="role" class="form-label">Função</label>
+      <select class="form-select" id="role" formControlName="role">
+        <option value="Engenheiro de FE">Engenheiro de FE</option>
+        <option value="Engenheiro de BE">Engenheiro de BE</option>
+        <option value="Analista de dados">Analista de dados</option>
+        <option value="Líder Técnico">Líder Técnico</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Senha</label>
+      <input type="password" class="form-control" id="password" formControlName="password">
+      <div *ngIf="editUserForm.get('password')?.invalid && editUserForm.get('password')?.touched" class="text-danger">
+        Por favor insira uma senha entre 6 e 15 caracteres
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="editUserForm.invalid">Salvar</button>
+  </form>
+</div>
